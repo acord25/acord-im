@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="acord - AI 오케스트레이션을 통해 더 나은 시스템을 만듭니다">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>acord</title>
+  <style>
+    /* === Reset === */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    img, picture, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    ul, ol { list-style: none; }
+
+    /* === Design Tokens === */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --text-muted: #666677;
+      --accent: #c0c0d0;
+      --accent-glow: rgba(192, 192, 208, 0.15);
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --container: 960px;
+      --transition: 0.3s ease;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+    }
+
+    /* === Layout === */
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* === Header === */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background var(--transition);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 18px 24px;
+    }
+
+    .nav__logo-img {
+      height: 36px;
+      width: auto;
+    }
+
+    .nav__links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .nav__links a {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      transition: color var(--transition);
+    }
+
+    .nav__links a:hover {
+      color: var(--text-primary);
+    }
+
+    /* === Hero === */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero__logo {
+      width: 280px;
+      max-width: 60vw;
+      margin: 0 auto 48px;
+    }
+
+    .hero__title {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 300;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .hero__tagline {
+      font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+
+    /* === Section Common === */
+    .section {
+      padding: 100px 0;
+    }
+
+    .section--alt {
+      background: var(--bg-secondary);
+    }
+
+    .section__label {
+      font-size: 1.3rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    /* === What We Do === */
+    .services__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .services__card {
+      padding: 36px 28px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      background: var(--bg-card);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .services__card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .services__icon {
+      font-size: 3.8rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 72px;
+      text-align: center;
+    }
+
+    .services__icon--lg {
+      font-size: 4.2rem;
+    }
+
+    .services__icon--sm {
+      font-size: 3.3rem;
+    }
+
+    .services__card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+
+    .services__card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    /* === Philosophy === */
+    .philosophy {
+      text-align: center;
+      padding: 120px 0;
+    }
+
+    .philosophy__text {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      color: var(--text-primary);
+      line-height: 1.8;
+      max-width: 640px;
+      margin: 0 auto;
+      letter-spacing: -0.01em;
+    }
+
+    .philosophy__text em {
+      font-style: normal;
+      color: var(--text-primary);
+    }
+
+    /* === Currently === */
+    .currently {
+      text-align: center;
+      padding: 100px 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .currently__badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+      font-size: 1.3rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .currently__text {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    /* === Footer === */
+    .footer {
+      padding: 28px 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer__inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0;
+      max-width: var(--container);
+      margin: 0 auto;
+    }
+
+    .footer__email {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      transition: color var(--transition);
+    }
+
+    .footer__email:hover {
+      color: var(--text-primary);
+    }
+
+    .footer__divider {
+      width: 1px;
+      height: 12px;
+      background: var(--text-muted);
+      margin: 0 20px;
+      opacity: 0.4;
+    }
+
+    .footer__copy {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* === Scroll Animation === */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade-in.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      .services__grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .section {
+        padding: 72px 0;
+      }
+
+      .philosophy {
+        padding: 80px 0;
+      }
+
+      .hero__logo {
+        width: 200px;
+        margin-bottom: 36px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .footer__inner {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .footer__divider {
+        display: none;
+      }
+
+      .nav__links {
+        gap: 20px;
+      }
+
+      .nav__links a {
+        font-size: 0.78rem;
+      }
+
+      .hero__logo {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav">
+      <div class="nav__logo">
+        <img src="src/assets/images/logo-v2.png" alt="acord" class="nav__logo-img">
+      </div>
+      <ul class="nav__links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#philosophy">About</a></li>
+        <li><a href="#contact" id="nav-contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero__content">
+      <img src="src/assets/images/logo-v2.png" alt="acord" class="hero__logo">
+      <h1 class="hero__title">AI와 사람 사이,<br>새로운 연결을 만듭니다</h1>
+      <p class="hero__tagline">Orchestrating AI, Amplifying Human Potential</p>
+    </div>
+  </section>
+
+  <!-- What We Do -->
+  <section class="section section--alt" id="services">
+    <div class="container">
+      <p class="section__label">What We Do</p>
+      <div class="services__grid">
+        <div class="services__card fade-in">
+          <span class="services__icon services__icon--lg">&#9881;</span>
+          <h3>AI Automation</h3>
+          <p>반복은 AI에게, 본질은 사람에게</p>
+        </div>
+        <div class="services__card fade-in">
+          <span class="services__icon">&#9879;</span>
+          <h3>System Integration</h3>
+          <p>흩어진 기술을 하나의 흐름으로</p>
+        </div>
+        <div class="services__card fade-in">
+          <span class="services__icon services__icon--sm">&#9672;</span>
+          <h3>Strategic Consulting</h3>
+          <p>기술이 아닌, 방향을 설계하는 일</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy -->
+  <section class="philosophy" id="philosophy">
+    <div class="container">
+      <p class="section__label">Philosophy</p>
+      <p class="philosophy__text fade-in">
+        복잡한 문제일수록, 답은 단순해야 합니다.<br>
+        <em>AI와 함께, 시스템으로 실현합니다.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- Currently -->
+  <section class="currently" id="currently">
+    <div class="container">
+      <div class="fade-in">
+        <span class="currently__badge">Coming Soon</span>
+        <p class="currently__text">새로운 프로젝트를 준비하고 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="footer__inner">
+      <a href="mailto:info@acord.im" class="footer__email">Contact : info@acord.im</a>
+      <span class="footer__divider"></span>
+      <span class="footer__copy">&copy; 2026 acord. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll fade-in animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+    // Contact nav: copy email + scroll to footer
+    const navContact = document.getElementById('nav-contact');
+    if (navContact) {
+      navContact.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText('info@acord.im').then(() => {
+          navContact.textContent = 'Copied!';
+          setTimeout(() => { navContact.textContent = 'Contact'; }, 1500);
+        });
+        document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  </script>
+</body>
+</html>
